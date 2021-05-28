@@ -14,7 +14,38 @@
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
-console.log('Hello World from Webpacker')
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import { gql } from "@apollo/client/core";
+import { ApolloProvider, useQuery } from "@apollo/client";
+
+import { ApolloClient, InMemoryCache } from "@apollo/client";
+const client = new ApolloClient({
+  uri: "/graphql",
+  cache: new InMemoryCache(),
+});
+
+const QUERY = gql`
+  {
+    time
+  }
+`;
+
+const App: React.FC = () => {
+  const { data } = useQuery(QUERY);
+
+  return <div>Hello World {data?.time}</div>;
+};
+
+const AppWithConfig: React.FC = () => (
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>
+);
+
+window.addEventListener("DOMContentLoaded", (event) => {
+  ReactDOM.render(<AppWithConfig />, document.getElementById("app"));
+});
